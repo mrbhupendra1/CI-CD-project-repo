@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'git-credentials',
+                    credentialsId: 'git-creds',
                     url: 'https://github.com/mrbhupendra1/CI-CD-project-repo.git'
             }
         }
