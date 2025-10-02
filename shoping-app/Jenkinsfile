@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION      = "ap-south-1"
-        AWS_ACCOUNT_ID  = "207963326787"   // your AWS account ID
-        IMAGE_NAME      = "shopping-app"
-        IMAGE_TAG       = "latest"
+        AWS_REGION     = "ap-south-1"
+        AWS_ACCOUNT_ID = "207963326787"
+        IMAGE_NAME     = "shopping-app"
+        IMAGE_TAG      = "latest"
         DOCKER_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
 
@@ -20,7 +20,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                dir('shoping-app') {
+                    sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                }
             }
         }
 
@@ -65,4 +67,3 @@ pipeline {
         }
     }
 }
-
