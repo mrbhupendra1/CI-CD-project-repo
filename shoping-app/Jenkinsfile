@@ -47,7 +47,7 @@ pipeline {
             steps {
                 sshagent(['vm2-ssh']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.55"
+                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.55 "\
                             docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} &&
                             docker stop shopping-app || true &&
                             docker rm shopping-app || true &&
