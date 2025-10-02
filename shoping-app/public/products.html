@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><title>Products - Aurora Shop</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="brand"><div class="logo">AS</div><div><h1>Aurora Shop</h1></div></div>
+    <div class="nav"><a href="index.html">Home</a><a href="about.html">About</a><a class="cta" href="cart.html">Cart (<span id="cart-count">0</span>)</a></div>
+  </div>
+
+  <section style="padding:18px 28px">
+    <h2>All Products</h2>
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <div class="cart-panel">
+    <div class="cart-btn" onclick="toggleCartPanel()">
+      <div>🛒</div><div style="font-weight:700" id="cart-count">0</div>
+    </div>
+  </div>
+  <div class="slide-in" id="cart-panel">
+    <h3>Your Cart</h3>
+    <div id="cart-items" style="max-height:420px;overflow:auto"></div>
+    <div style="display:flex;justify-content:space-between;padding-top:12px">
+      <div style="font-weight:700">Total: <span id="cart-total">₹0</span></div>
+      <div><button onclick="placeOrder()" style="padding:10px 12px;border-radius:8px;background:linear-gradient(90deg,#06b6d4,#7c3aed);border:none;color:#041025">Checkout</button></div>
+    </div>
+  </div>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/main.js"></script>
+  <script>renderProducts('grid')</script>
+</body>
+</html>
+

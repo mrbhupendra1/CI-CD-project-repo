@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Aurora Shop - Home</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div class="logo">AS</div>
+      <div>
+        <h1>Aurora Shop</h1>
+        <div style="color:var(--muted);font-size:12px">Unique picks • Fast delivery</div>
+      </div>
+    </div>
+    <div class="nav">
+      <a href="products.html">Products</a>
+      <a href="about.html">About</a>
+      <a class="cta" href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-left">
+      <h2>Lightweight gear. Electric design.</h2>
+      <p>Discover limited-edition sneakers, jackets and accessories with neon accents and motion-inspired aesthetics.</p>
+      <button id="shop-now" class="shop-btn">Shop New Drops</button>
+    </div>
+    <div class="hero-right">
+      <div class="hero-card">
+        <img src="https://source.unsplash.com/800x600/?sneakers" style="width:90%;height:80%;object-fit:cover;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6)">
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:18px 28px">
+    <h3 style="margin:0 0 12px">Featured</h3>
+    <div id="featured" class="grid"></div>
+  </section>
+
+  <div class="cart-panel">
+    <div class="cart-btn" onclick="toggleCartPanel()">
+      <div>🛒</div>
+      <div style="font-weight:700" id="cart-count">0</div>
+    </div>
+  </div>
+
+  <div class="slide-in" id="cart-panel">
+    <h3 style="margin:6px 0">Your Cart</h3>
+    <div id="cart-items" style="max-height:420px;overflow:auto"></div>
+    <div style="display:flex;justify-content:space-between;padding-top:12px">
+      <div style="font-weight:700">Total: <span id="cart-total">₹0</span></div>
+      <div>
+        <button onclick="placeOrder()" style="padding:10px 12px;border-radius:8px;background:linear-gradient(90deg,#06b6d4,#7c3aed);border:none;color:#041025">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/main.js"></script>
+  <script>renderProducts('featured')</script>
+</body>
+</html>
+
