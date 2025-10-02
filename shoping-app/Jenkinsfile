@@ -4,25 +4,27 @@ pipeline {
     environment {
         AWS_REGION     = "ap-south-1"
         AWS_ACCOUNT_ID = "207963326787"
+        ECR_REPO       = "shopping-app"
         IMAGE_NAME     = "shopping-app"
+        IMAGE_TAG      = "latest"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'git-creds',
-                    url: 'https://github.com/mrbhupendra1/CI-CD-project-repo.git'
+                    url: 'https://github.com/mrbhupendra1/CI-CD-project-repo.git',
+                    credentialsId: 'git-credentials'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
+                    echo "[INFO] Building Docker image..."
                     sh """
-                        echo "[INFO] Building Docker image..."
-                        docker build -t ${IMAGE_NAME}:latest ./shoping-app
-                        docker tag ${IMAGE_NAME}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest
+                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ./shoping-app
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
                     """
                 }
             }
@@ -30,29 +32,27 @@ pipeline {
 
         stage('Push to AWS ECR') {
             steps {
-                withAWS(region: "${AWS_REGION}", credentials: 'aws-credentials') {
-                    sh """
-                        echo "[INFO] Logging in to AWS ECR..."
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-
-                        echo "[INFO] Pushing Docker image to ECR..."
-                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest
-                    """
+                withAWS(region: "${AWS_REGION}", credentials: 'aws-creds') {
+                    script {
+                        sh """
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                            docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }
 
         stage('Deploy to VM2 (Testing)') {
             steps {
-                sshagent(['ssh-credential-vm2']) {
+                sshagent(['vm2-ssh']) {
                     sh """
-                        echo "[INFO] Deploying to VM2..."
-                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.55'
-                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest &&
-                            docker stop ${IMAGE_NAME} || true &&
-                            docker rm ${IMAGE_NAME} || true &&
-                            docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest
-                        '
+                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.55"
+                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} &&
+                            docker stop shopping-app || true &&
+                            docker rm shopping-app || true &&
+                            docker run -d --name shopping-app -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+                        "
                     """
                 }
             }
@@ -60,15 +60,14 @@ pipeline {
 
         stage('Deploy to VM3 (Production)') {
             steps {
-                sshagent(['ssh-credential-vm3']) {
+                sshagent(['vm3-ssh']) {
                     sh """
-                        echo "[INFO] Deploying to VM3..."
-                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.220 '
-                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest &&
-                            docker stop ${IMAGE_NAME} || true &&
-                            docker rm ${IMAGE_NAME} || true &&
-                            docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}:latest
-                        '
+                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.220"
+                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} &&
+                            docker stop shopping-app || true &&
+                            docker rm shopping-app || true &&
+                            docker run -d --name shopping-app -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+                        "
                     """
                 }
             }
