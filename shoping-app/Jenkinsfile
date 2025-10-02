@@ -2,17 +2,19 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = "ap-south-1"
-        AWS_ACCOUNT_ID = "207963326787"   // apna account ID dalna
-        IMAGE_NAME = "shopping-app"
-        IMAGE_TAG = "latest"
+        AWS_REGION      = "ap-south-1"
+        AWS_ACCOUNT_ID  = "207963326787"   // your AWS account ID
+        IMAGE_NAME      = "shopping-app"
+        IMAGE_TAG       = "latest"
         DOCKER_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/mrbhupendra1/shopping-app.git'
+                git branch: 'main',
+                    url: 'https://github.com/mrbhupendra1/shopping-app.git',
+                    credentialsId: 'github-credentials'
             }
         }
 
