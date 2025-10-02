@@ -7,6 +7,9 @@ pipeline {
         ECR_REPO       = "shopping-app"
         IMAGE_NAME     = "shopping-app"
         IMAGE_TAG      = "latest"
+
+        // Jenkins credentials (AWS)
+        AWS_CREDS = credentials('aws-creds')
     }
 
     stages {
@@ -48,6 +51,8 @@ pipeline {
                 sshagent(['vm2-ssh']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.55 "\
+                            AWS_ACCESS_KEY_ID=${AWS_CREDS_USR} \
+                            AWS_SECRET_ACCESS_KEY=${AWS_CREDS_PSW} \
                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com && \
                             docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} && \
                             docker stop shopping-app || true && \
@@ -64,6 +69,8 @@ pipeline {
                 sshagent(['vm3-ssh']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.220 "\
+                            AWS_ACCESS_KEY_ID=${AWS_CREDS_USR} \
+                            AWS_SECRET_ACCESS_KEY=${AWS_CREDS_PSW} \
                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com && \
                             docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} && \
                             docker stop shopping-app || true && \
