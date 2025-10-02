@@ -48,10 +48,11 @@ pipeline {
                 sshagent(['vm2-ssh']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.55 "\
-                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} &&
-                            docker stop shopping-app || true &&
-                            docker rm shopping-app || true &&
-                            docker run -d --name shopping-app -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com && \
+                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} && \
+                            docker stop shopping-app || true && \
+                            docker rm shopping-app || true && \
+                            docker run -d --name shopping-app -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} \
                         "
                     """
                 }
@@ -62,11 +63,12 @@ pipeline {
             steps {
                 sshagent(['vm3-ssh']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.220 "
-                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} &&
-                            docker stop shopping-app || true &&
-                            docker rm shopping-app || true &&
-                            docker run -d --name shopping-app -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}
+                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.2.220 "\
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com && \
+                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} && \
+                            docker stop shopping-app || true && \
+                            docker rm shopping-app || true && \
+                            docker run -d --name shopping-app -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} \
                         "
                     """
                 }
